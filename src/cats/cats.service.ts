@@ -3,7 +3,14 @@ import { Cat } from './dto/cat.dto';
 
 @Injectable()
 export class CatsService {
-  private readonly cats: Cat[] = [];
+  private readonly cats: Cat[] = [
+    {
+      name: 'Mega-Chonks',
+      age: 88,
+      breed: 'Chonker',
+      id: '941926ea-bc2c-4a39-8c66-6625fb7bc73c',
+    },
+  ];
 
   create(cat: Cat) {
     this.cats.push(cat);
@@ -15,6 +22,10 @@ export class CatsService {
 
   meow(): string {
     return 'Meow';
+  }
+
+  findOne(id: string): Cat {
+    return this.cats.find((cat) => cat.id === id);
   }
 }
 

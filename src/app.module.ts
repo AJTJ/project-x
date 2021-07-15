@@ -6,22 +6,22 @@ import {
 } from '@nestjs/common';
 import { CatsModule } from './cats/cats.module';
 import { LoggerMiddleware, OtherLog } from './common/logger.middleware';
-import { GraphQLModule } from '@nestjs/graphql';
-import { join } from 'path/posix';
+// import { GraphQLModule } from '@nestjs/graphql';
+// import { join } from 'path/posix';
 
-const prodOptions = {
-  debug: false,
-  playground: false,
-};
+// const prodOptions = {
+//   debug: false,
+//   playground: false,
+// };
 
 @Module({
   imports: [
     CatsModule,
-    GraphQLModule.forRoot({
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      sortSchema: true,
-      include: [CatsModule],
-    }),
+    // GraphQLModule.forRoot({
+    //   autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    //   sortSchema: true,
+    //   include: [CatsModule],
+    // }),
   ],
 })
 export class AppModule implements NestModule {
