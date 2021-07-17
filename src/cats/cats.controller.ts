@@ -3,19 +3,15 @@ import {
   Get,
   HttpCode,
   Post,
-  Req,
-  Header,
   Redirect,
   Param,
-  HostParam,
   Body,
   Res,
   HttpStatus,
   HttpException,
   UseFilters,
-  ForbiddenException,
-  ParseIntPipe,
   ParseUUIDPipe,
+  UsePipes,
 } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -23,10 +19,12 @@ import { Response } from 'express';
 import { CatsService } from './cats.service';
 
 // DTO
-import { CreateCat } from './dto/create-cat.dto';
+import { CreateCatDto, CreateCatSchema } from './dto/create-cat.dto';
 import { Cat } from './dto/cat.dto';
 import { HttpExceptionFilter } from 'src/common/http-exception.filter';
 import { v4 as uuidv4 } from 'uuid';
+import { JoiValidationPipe } from 'src/common/joi-validation.pipe';
+import { ClassValidationPipe } from 'src/common/class-validation.pipe';
 
 // This is a controller-scoped filter. It is applied to all requests.
 // @UseFilters(new HttpExceptionFilter())
@@ -41,13 +39,15 @@ export class CatsController {
 
   // @Header('Cache-Control', 'none')
   @Post()
-  @UseFilters(new HttpExceptionFilter())
-  async createCat(@Body() createCatDto: CreateCat): Promise<Cat[]> {
+  // @UseFilters(new HttpExceptionFilter())
+  // @UsePipes(new JoiValidationPipe(CreateCatSchema))
+  async createCat(
+    @Body(new ClassValidationPipe()) createCatDto: CreateCatDto,
+  ): Promise<Cat[]> {
     const id = uuidv4();
     const newCat = { ...createCatDto, id };
     this.catsService.create(newCat);
     return this.catsService.findAll();
-    // throw new ForbiddenException();
   }
 
   @Get('meow')
