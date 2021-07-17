@@ -12,6 +12,8 @@ import {
   UseFilters,
   ParseUUIDPipe,
   UsePipes,
+  Query,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -24,7 +26,7 @@ import { Cat } from './dto/cat.dto';
 import { HttpExceptionFilter } from 'src/common/http-exception.filter';
 import { v4 as uuidv4 } from 'uuid';
 import { JoiValidationPipe } from 'src/common/joi-validation.pipe';
-import { ClassValidationPipe } from 'src/common/class-validation.pipe';
+import { ParseIntPipe } from 'src/common/parise-int.pipe';
 
 // This is a controller-scoped filter. It is applied to all requests.
 // @UseFilters(new HttpExceptionFilter())
@@ -33,31 +35,34 @@ export class CatsController {
   constructor(private catsService: CatsService) {}
 
   @Get()
-  async findAll(): Promise<Cat[]> {
-    return this.catsService.findAll();
+  async findAll(
+    // adding a default value
+    @Query('secretOfLife', new DefaultValuePipe(42), ParseIntPipe)
+    secretOfLife: number,
+  ): Promise<Cat[]> {
+    return this.catsService.findAll(secretOfLife);
   }
 
   // @Header('Cache-Control', 'none')
   @Post()
   // @UseFilters(new HttpExceptionFilter())
   // @UsePipes(new JoiValidationPipe(CreateCatSchema))
-  async createCat(
-    @Body(new ClassValidationPipe()) createCatDto: CreateCatDto,
-  ): Promise<Cat[]> {
+  // @Body(new ClassValidationPipe()) createCatDto: CreateCatDto,
+  async createCat(@Body() createCatDto: CreateCatDto): Promise<Cat> {
     const id = uuidv4();
     const newCat = { ...createCatDto, id };
-    this.catsService.create(newCat);
-    return this.catsService.findAll();
+    return this.catsService.create(newCat);
   }
 
   @Get('meow')
-  @HttpCode(204)
+  // This custom http code will stop it from returning content
+  // @HttpCode(204)
   async getMeow(): Promise<string> {
     return this.catsService.meow();
   }
 
   @Get(':id')
-  async findOne(
+  async findById(
     @Param(
       'id',
       new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
@@ -65,6 +70,14 @@ export class CatsController {
     id: string,
   ): Promise<Cat> {
     return this.catsService.findOne(id);
+  }
+
+  @Get('age/:age')
+  async findByAge(
+    @Param('age', new ParseIntPipe())
+    age: number,
+  ): Promise<Cat[]> {
+    return this.catsService.findCatsByAge(age);
   }
 
   // OTHER EXAMPLES

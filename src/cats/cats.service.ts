@@ -14,9 +14,11 @@ export class CatsService {
 
   create(cat: Cat) {
     this.cats.push(cat);
+    return cat;
   }
 
-  findAll(): Cat[] {
+  findAll(secretOfLife: number): Cat[] {
+    console.log(secretOfLife);
     return this.cats;
   }
 
@@ -26,6 +28,10 @@ export class CatsService {
 
   findOne(id: string): Cat {
     return this.cats.find((cat) => cat.id === id);
+  }
+
+  findCatsByAge(catAge: number): Cat[] {
+    return this.cats.filter((cat) => cat.age === catAge);
   }
 }
 
