@@ -14,6 +14,8 @@ import {
   UsePipes,
   Query,
   DefaultValuePipe,
+  UseGuards,
+  SetMetadata,
 } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -27,10 +29,12 @@ import { HttpExceptionFilter } from 'src/common/http-exception.filter';
 import { v4 as uuidv4 } from 'uuid';
 import { JoiValidationPipe } from 'src/common/joi-validation.pipe';
 import { ParseIntPipe } from 'src/common/parise-int.pipe';
+import { RolesGuard } from 'src/common/roles.guard';
 
 // This is a controller-scoped filter. It is applied to all requests.
 // @UseFilters(new HttpExceptionFilter())
 @Controller('cats')
+@UseGuards(new RolesGuard())
 export class CatsController {
   constructor(private catsService: CatsService) {}
 
@@ -48,6 +52,8 @@ export class CatsController {
   // @UseFilters(new HttpExceptionFilter())
   // @UsePipes(new JoiValidationPipe(CreateCatSchema))
   // @Body(new ClassValidationPipe()) createCatDto: CreateCatDto,
+  // SET METADATA USED TO APPLY A ROLE FOR THE GUARD
+  @SetMetadata('roles', ['admin'])
   async createCat(@Body() createCatDto: CreateCatDto): Promise<Cat> {
     const id = uuidv4();
     const newCat = { ...createCatDto, id };
